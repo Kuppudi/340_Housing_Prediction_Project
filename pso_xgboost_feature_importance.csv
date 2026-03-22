@@ -1,0 +1,10 @@
+feature,importance
+dataset_HousingCSV,0.33662784
+dataset_Ames,0.23613973
+dataset_KingCounty,0.19353606
+area,0.08805214
+bathrooms,0.05617883
+dataset_World,0.053084537
+bedrooms,0.022248771
+year_built,0.0076649
+house_age,0.006467208
