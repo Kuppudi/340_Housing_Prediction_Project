@@ -1,7 +1,8 @@
 import pandas as pd
 import numpy as np
+import os
 
-base_path = "/Users/dhruvnasit/Desktop/Housing Price Prediction/"
+base_path = os.path.dirname(os.path.abspath(__file__)) + os.sep
 
 df = pd.read_csv(base_path + "cleaned_housing_data.csv")
 
@@ -105,9 +106,20 @@ final_pred = final_model.predict(X_test[selected_features])
 # Evaluate
 rmse = mean_squared_error(y_test, final_pred) ** 0.5
 r2 = r2_score(y_test, final_pred)
+catboost_mae = mean_absolute_error(y_test, final_pred)
+catboost_mape = np.mean(np.abs((y_test - final_pred) / np.maximum(np.abs(y_test), 1e-9))) * 100
+catboost_rmsle = np.sqrt(
+    mean_squared_log_error(
+        np.maximum(y_test, 0),
+        np.maximum(final_pred, 0)
+    )
+)
 
 print("\nFinal Model Performance:")
 print("RMSE:", rmse)
+print("MAE:", catboost_mae)
+print("MAPE (%):", catboost_mape)
+print("RMSLE:", catboost_rmsle)
 print("R² Score:", r2)
 print("Best iteration:", final_model.get_best_iteration())
 
@@ -346,19 +358,18 @@ print("Best boosted rounds used:", pso_xgb_model.best_iteration)
 print("\nModel Comparison Summary:")
 comparison_df = pd.DataFrame({
     "Model": ["CatBoost", "XGBoost Baseline", "PSO-XGBoost"],
-    "RMSE": [0.458152, xgb_rmse, pso_xgb_rmse],
-    "MAE": [None, xgb_mae, pso_xgb_mae],
-    "MAPE_%": [None, xgb_mape, pso_xgb_mape],
-    "RMSLE": [None, xgb_rmsle, pso_xgb_rmsle],
-    "R2": [0.704823, xgb_r2, pso_xgb_r2]
+    "RMSE": [rmse, xgb_rmse, pso_xgb_rmse],
+    "MAE": [catboost_mae, xgb_mae, pso_xgb_mae],
+    "MAPE_%": [catboost_mape, xgb_mape, pso_xgb_mape],
+    "RMSLE": [catboost_rmsle, xgb_rmsle, pso_xgb_rmsle],
+    "R2": [r2, xgb_r2, pso_xgb_r2]
 })
 print(comparison_df)
 
 # Feature importance for PSO-XGBoost
 pso_importance_df = pd.DataFrame({
     "feature": pso_features,
-    "importance": pso_xgb_model.feature_importances_
-}).sort_values(by="importance", ascending=False)
+    "importance": pso_xgb_model.feature_importances_}).sort_values(by="importance", ascending=False)
 
 print("\nPSO-XGBoost Feature Importance:")
 print(pso_importance_df)
@@ -370,6 +381,78 @@ print("\nResidual summary (PSO-XGBoost):")
 print(pd.Series(pso_residuals).describe())
 
 # Plots
+# CatBoost Plots
+plt.figure(figsize=(8, 6))
+plt.scatter(y_test, final_pred, alpha=0.4)
+plt.xlabel("Actual Log Price")
+plt.ylabel("Predicted Log Price")
+plt.title("CatBoost: Predicted vs Actual")
+plt.grid(True)
+plt.tight_layout()
+plt.show()
+
+catboost_residuals = y_test - final_pred
+
+plt.figure(figsize=(8, 6))
+plt.scatter(final_pred, catboost_residuals, alpha=0.4)
+plt.axhline(y=0, linestyle="--")
+plt.xlabel("Predicted Log Price")
+plt.ylabel("Residuals")
+plt.title("CatBoost: Residual Plot")
+plt.grid(True)
+plt.tight_layout()
+plt.show()
+
+# CatBoost Feature Importance
+final_importance_df = pd.DataFrame({
+    "feature": selected_features,
+    "importance": final_model.get_feature_importance()}).sort_values(by="importance", ascending=False)
+
+plt.figure(figsize=(10, 6))
+plt.bar(final_importance_df["feature"], final_importance_df["importance"])
+plt.xticks(rotation=45, ha="right")
+plt.xlabel("Feature")
+plt.ylabel("Importance")
+plt.title("CatBoost Feature Importance")
+plt.tight_layout()
+plt.show()
+
+# XGBoost Baseline Plots
+plt.figure(figsize=(8, 6))
+plt.scatter(y_test_xgb, xgb_pred, alpha=0.4)
+plt.xlabel("Actual Log Price")
+plt.ylabel("Predicted Log Price")
+plt.title("XGBoost Baseline: Predicted vs Actual")
+plt.grid(True)
+plt.tight_layout()
+plt.show()
+
+xgb_residuals = y_test_xgb - xgb_pred
+
+plt.figure(figsize=(8, 6))
+plt.scatter(xgb_pred, xgb_residuals, alpha=0.4)
+plt.axhline(y=0, linestyle="--")
+plt.xlabel("Predicted Log Price")
+plt.ylabel("Residuals")
+plt.title("XGBoost Baseline: Residual Plot")
+plt.grid(True)
+plt.tight_layout()
+plt.show()
+
+# XGBoost Baseline Feature Importance
+xgb_importance_df = pd.DataFrame({
+    "feature": xgb_features,
+    "importance": xgb_model.feature_importances_}).sort_values(by="importance", ascending=False)
+
+plt.figure(figsize=(10, 6))
+plt.bar(xgb_importance_df["feature"], xgb_importance_df["importance"])
+plt.xticks(rotation=45, ha="right")
+plt.xlabel("Feature")
+plt.ylabel("Importance")
+plt.title("XGBoost Baseline Feature Importance")
+plt.tight_layout()
+plt.show()
+
 plt.figure(figsize=(8, 6))
 plt.scatter(y_test_pso, pso_xgb_pred, alpha=0.4)
 plt.xlabel("Actual Log Price")
