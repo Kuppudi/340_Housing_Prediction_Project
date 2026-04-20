@@ -46,16 +46,14 @@ Put the files in a single project folder using a structure like this:
 ``` text
 Housing-Price-Prediction/
 │
-├── data/
-│   ├── ames_housing.csv
-│   ├── king_county_house_data.csv
-│   ├── Housing.csv
-│   └── world_housing.csv
+├── ames_housing.csv
+├── king_county_house_data.csv
+├── Housing.csv
+├──  world_housing.csv
 │
 ├── Dataset load.py
 ├── Modelling.py
 ├── cleaned_housing_data.csv         # generated after preprocessing
-├── README_Housing_Price_Prediction.md
 └── requirements.txt
 ```
 
@@ -159,7 +157,7 @@ If your script currently reads files from another location, either:
 
 ## Step 4: Run preprocessing
 
-The preprocessing script is assumed to be:
+The preprocessing script is:
 
 ``` text
 Dataset load.py
