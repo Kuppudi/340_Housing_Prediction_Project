@@ -1,1 +1,1 @@
-# 340_Housing_Prediction_Project
+# DS340W - House price prediction using machine learning.
