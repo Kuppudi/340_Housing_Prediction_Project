@@ -131,32 +131,8 @@ py -3 -m venv .venv
 Install the required Python libraries:
 
 ``` bash
-pip install -r requirements.txt
+pip install numpy pandas scikit-learn xgboost catboost pyswarms matplotlib seaborn shap scipy joblib
 ```
-
-If you do not have a `requirements.txt` file yet, create one with the
-contents below.
-
-``` text
-numpy
-pandas
-scikit-learn
-xgboost
-catboost
-pyswarms
-matplotlib
-seaborn
-shap
-scipy
-joblib
-```
-
-Then run:
-
-``` bash
-pip install -r requirements.txt
-```
-
 ------------------------------------------------------------------------
 
 ## Step 3: Place the dataset files in the correct folder
